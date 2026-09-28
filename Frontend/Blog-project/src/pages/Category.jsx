@@ -1,76 +1,140 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import {OrbitProgress}  from "react-loading-indicators"
-import Header from '../components/Header'
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import { API_URL } from "../service/api";
 const Category = () => {
-    const {categoryid,catname}=useParams()
-    let [post,setpost]=useState([])
-    let [err,seterr]=useState("")
-    let [loading,setloading]=useState(true)
-    let navigate=useNavigate()
-    useEffect(()=>{
-             axios.get(`https://mern-stack-blog-production-b5b5.up.railway.app/api/category/${categoryid}`,{
-               headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}
-             })
-             .then((res)=>{
-                   setpost(res.data)
-             }).catch((err)=>{
-                 seterr(err.message)
-             }).finally(()=>{
-                setloading(false)
-             })
-    },[])
-     if(loading){
-           return(
-              <div>
-                  <OrbitProgress variant="spokes" color="#32cd32" size="medium" text="" textColor="" />
+  const { categoryid, catname } = useParams();
+  const [posts, setPosts] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    let requestIsActive = true;
+    axios
+      .get(`${API_URL}/api/category/${categoryid}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      })
+      .then(({ data }) => {
+        if (requestIsActive) setPosts(data);
+      })
+      .catch((requestError) => {
+        if (requestIsActive) {
+          setError(
+            requestError.response?.data?.message ||
+              "Unable to load this topic right now.",
+          );
+        }
+      })
+      .finally(() => {
+        if (requestIsActive) setLoading(false);
+      });
+    return () => {
+      requestIsActive = false;
+    };
+  }, [categoryid]);
+
+  return (
+    <div className="flex min-h-screen flex-col bg-[#f7f8f4]">
+      <Header />
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6">
+        <div className="mb-6 border-b border-slate-300 pb-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-emerald-800">
+            Topic archive
+          </p>
+          <h1 className="mt-1 wrap-break-word font-serif text-3xl font-bold text-slate-900">
+            {catname}
+          </h1>
+        </div>
+        {error && (
+          <p
+            role="alert"
+            className="border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm text-red-800"
+          >
+            {error}
+          </p>
+        )}
+        {loading ? (
+          <div
+            role="status"
+            className="grid gap-4 py-3"
+            aria-label="Loading topic posts"
+          >
+            {[0, 1].map((item) => (
+              <div
+                key={item}
+                className="animate-pulse border-b border-slate-200 py-6"
+              >
+                <div className="h-3 w-24 rounded bg-slate-200" />
+                <div className="mt-3 h-6 w-2/3 rounded bg-slate-200" />
+                <div className="mt-3 h-4 w-full rounded bg-slate-100" />
               </div>
-              )
-      }
-       return (
-     <div className="">
-      <Header></Header>
-         {err && <h1>{err}</h1>}
-       
-         <h1 className='text-center  font-serif text-2xl mt-3 uppercase bg-gradient-to-r from-purple-800 to-gray-500 tracking-widest  font-extrabold bg-clip-text text-transparent'>{catname}</h1>
-     {
-            post.length<1 ? <h1 className='text-center mt-3 font-mono'>No posts available in this catgory yet!</h1> :
-        <ul className="grid  gap-y-4 mt-2 lg:grid-cols-2 lg:gap-x-2 ">
-          {post.map((items) => {
-            return (
-              <li key={items._id} className="lg:mx-0 lg:px-1  mx-2 px-2 sm:px-9 grid gap-y-1 gap-x-2 md:flex  ">
-                {items.image && <div onClick={()=>{
-                     navigate(`/home/${items._id}`)
-                }} className='w-full  h-[300px]  sm:h-[400px]  md:h-[250px] md:w-[250px]'>     
-                  <img
-                    src={items.image}
-                    className=" w-full h-full object-fill rounded-md"
-                    alt=""
-                  />
-                  </div>
-                }
-                <div className="shadow  shadow-sm  flex-1 p-3  flex flex-col gap-y-1 shadow-gray-400  rounded-sm hover:cursor-pointer" onClick={()=>{
-                      navigate(`/home/${items._id}`)
-                }}>
-                <div className='grid gap-y-1' >
-                  <h5 className="text-white rounded-sm font-serif font-semibold bg-purple-500 w-fit p-1 px-3  ">{items.category.name}</h5>
-                  <h1 className='font-serif'>By {items.author.name} .</h1>
-                  <p className='font-mono'>{new Date(items.createdAt).toDateString()}</p>
-                  </div >
-                  <div className='grid gap-y-1'>
-
-                  <h1 className="text-lg font-medium">{items.title}</h1>
-                  <p className='text-gray-600 first-letter:uppercase '>{items.description.slice(0,80)}.....</p>
-                  </div>
+            ))}
+          </div>
+        ) : posts.length ? (
+          <ul className="divide-y divide-slate-200">
+            {posts.map((post) => (
+              <li
+                key={post._id}
+                className="grid gap-4 py-5 sm:grid-cols-[minmax(0,1fr)_200px] sm:items-center"
+              >
+                <div>
+                  <p className="text-xs text-slate-500">
+                    By {post.author?.name || "Unknown author"} ·{" "}
+                    {new Date(post.createdAt).toLocaleDateString()}
+                  </p>
+                  <Link
+                    to={`/home/${post._id}`}
+                    className="mt-2 block font-serif text-xl font-bold text-slate-900 hover:text-emerald-800 sm:text-2xl"
+                  >
+                    {post.title}
+                  </Link>
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-600">
+                    {post.description}
+                  </p>
+                  <Link
+                    to={`/home/${post._id}`}
+                    className="mt-3 inline-block text-sm font-semibold text-emerald-800 hover:underline"
+                  >
+                    Read story →
+                  </Link>
                 </div>
+                {post.image && (
+                  <Link
+                    to={`/home/${post._id}`}
+                    className="order-first block aspect-video overflow-hidden bg-slate-200 sm:order-last sm:aspect-4/3"
+                  >
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  </Link>
+                )}
               </li>
-            );
-          })}
-        </ul>
-     }
-     </div>
-       )
-}
+            ))}
+          </ul>
+        ) : !error ? (
+          <div className="border-y border-slate-200 py-12 text-center">
+            <h2 className="font-serif text-2xl font-semibold text-slate-800">
+              No stories in this topic yet.
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Try another topic or browse all posts.
+            </p>
+            <Link
+              to="/home"
+              className="mt-5 inline-flex rounded-sm bg-[#17483e] px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"
+            >
+              Browse all posts
+            </Link>
+          </div>
+        ) : null}
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
-export default Category
+export default Category;

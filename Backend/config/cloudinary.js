@@ -1,7 +1,5 @@
-const cloudinary=require("cloudinary").v2
+const cloudinary = require("cloudinary").v2;
 cloudinary.config({
-       secure:true
-})
-console.log(process.env.CLOUDINARY_URL);
-
-module.exports=cloudinary
+  secure: true,
+});
+module.exports = cloudinary;

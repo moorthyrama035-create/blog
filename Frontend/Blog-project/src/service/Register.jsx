@@ -1,71 +1,182 @@
-import axios from 'axios'
-import React, { useState } from 'react'
-import {useForm} from "react-hook-form"
-import * as yup from "yup"
-import {yupResolver} from "@hookform/resolvers/yup"
-import { useNavigate } from 'react-router-dom'
-import Blogimage from "../assets/blog.png"
-import bloggirl from "../assets/bloggirl.png"
-import { Link } from 'react-router-dom'
+import axios from "axios";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from "react-router-dom";
+import Blogimage from "../assets/blog.png";
+import bloggirl from "../assets/bloggirl.png";
+import { Link } from "react-router-dom";
+import { API_URL } from "./api";
 const Register = () => {
-  let navigate=useNavigate()
-   
-  const userschema=yup.object({
-    name:yup.string().required("name is required"),
-    email:yup.string().email("Enter a valid email").required("email is required"),
-    password:yup.string().required("Password is required").matches(/^[a-zA-Z]+[0-9]+$/),
-    Cpassword:yup.string().oneOf([yup.ref("password")],"Password doesn't match").required("Confirm password is required")
+  const navigate = useNavigate();
+  const [submitError, setSubmitError] = useState("");
+
+  const userschema = yup.object({
+    name: yup.string().required("name is required"),
+    email: yup
+      .string()
+      .email("Enter a valid email")
+      .required("email is required"),
+    password: yup
+      .string()
+      .required("Password is required")
+      .matches(/^[a-zA-Z]+[0-9]+$/, "Use letters followed by numbers"),
+    Cpassword: yup
+      .string()
+      .oneOf([yup.ref("password")], "Password doesn't match")
+      .required("Confirm password is required"),
   });
-  let {register,handleSubmit,formState:{errors}} =useForm({
-   resolver:yupResolver(
-          userschema
-  )
+  let {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(userschema),
+  });
+  async function handlesubmit(data) {
+    setSubmitError("");
+    try {
+      await axios.post(`${API_URL}/api/Register`, data);
+      navigate("/login", {
+        state: { notice: "Account created. Please sign in." },
+      });
+    } catch (requestError) {
+      setSubmitError(
+        requestError.response?.data?.message ||
+          "Registration failed. Check your connection and try again.",
+      );
+    }
   }
-  );
-function handlesubmit(data){
-  console.log(data);
-  
-        axios.post("https://mern-stack-blog-production-b5b5.up.railway.app/api/Register",data).then((res)=>{      
-                 confirm(res.data.message);
-                navigate("/login")      
-        }).catch((err)=>{
-             alert(err.response.data.message)
-        })
-}
   return (
-    <div className='bg-purple-100 min-w-[310px] min-h-screen max-h-fit'>
-      <header className='p-2'>
-        <img className='w-25' src={Blogimage} alt=""/>
+    <div className="min-h-screen bg-[#f3f5ef] text-slate-900">
+      <header className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-4 sm:px-6">
+        <img className="h-9 w-9 object-contain" src={Blogimage} alt="" />
+        <span className="font-serif text-xl font-bold">Blogify</span>
       </header>
-    <div className='flex flex-col gap-y-2 '>
-      <div className='grid gap-y-3 p-3'> 
-        <p className='font-bold text-center'>Share your ideas <span className='text-purple-700'>inpire</span> the world</p>
-        <p className='text-gray-500 text-center' >join our community of writers and readers.Create,Share and grow together</p>
-        <img className='w-[200px] object-contain m-auto ' src={bloggirl} alt=""/>
-      </div>
-       <div className='bg-white  m-6 md:mx-9 lg:mx-16  rounded-md pt-2 pb-3 sm:p-3 '>
-        <h1 className='text-center text-lg font-medium font-serif tracking-wider'>Create Your Account</h1>
-         <p className='text-center text-sm font-sans'>Let's get you started</p>
-         <form onSubmit={handleSubmit(handlesubmit)} className='p-3 grid gap-y-4' action="">
-            <input  {...register("name")}  className='outline-2 p-2 placeholder:text-gray-800 px-2 focus:outline-purple-400  block rounded-sm text-lg outline-gray-300 ' placeholder='Full Name' type="text"/>
-           {errors.name &&  <p className='text-red-500'>{errors.name.message}</p>}
-            <input  {...register("email")} className='p-2 outline-2 block rounded-sm text-lg outline-gray-300 focus:outline-purple-400  placeholder:text-gray-800 px-2' placeholder='email' type="text"/>
-            {errors.email && <p className='text-red-500'>{errors.email.message}</p> }
-            <input  {...register("password")}  className='p-2 outline-2 block rounded-sm text-lg focus:outline-purple-400  outline-gray-300 placeholder:text-gray-800 px-2' placeholder='Password' type="text"/>
-            {errors.password && <p className='text-red-500'>{errors.password.message}</p>}
-            <input {...register("Cpassword")} className='outline-2 p-2 block rounded-sm text-lg focus:outline-purple-400  outline-gray-300 placeholder:text-gray-800 px-2' placeholder='Confirm Password' type="text"/>
-            {errors.Cpassword && <p className='text-red-500'>{errors.Cpassword.message}</p>}
-            <button className='rounded-md font-sans text-white font-medium cursor-pointer active:scale-95 bg-purple-800 p-2' type='submit'>Register</button>
-         </form>
-            <h1 className='text-center'>Already have an account ? <span className='text-purple-600 font-medium' onClick={()=>{
-               
-            }}><Link to="/login">Login</Link></span></h1>
-         </div>
+      <main className="mx-auto grid max-w-6xl overflow-hidden bg-white shadow-sm lg:min-h-[calc(100vh-88px)] lg:grid-cols-[1fr_0.9fr]">
+        <section className="relative flex min-h-56 flex-col justify-between overflow-hidden bg-[#17483e] p-6 text-white sm:p-10 lg:min-h-full">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-200">
+              Make room for good ideas
+            </p>
+            <h1 className="mt-4 max-w-md font-serif text-3xl font-semibold leading-tight sm:text-4xl">
+              Your next story starts here.
+            </h1>
+          </div>
+          <img
+            className="mx-auto mt-5 h-40 w-full object-contain sm:h-56 lg:h-72"
+            src={bloggirl}
+            alt="Illustration of a person writing"
+          />
+        </section>
+        <section className="flex items-center px-4 py-8 sm:px-10 lg:px-14">
+          <div className="mx-auto w-full max-w-md">
+            <p className="text-sm font-semibold uppercase tracking-widest text-emerald-800">
+              Join the community
+            </p>
+            <h2 className="mt-2 font-serif text-3xl font-bold">
+              Create your account
+            </h2>
+            <p className="mt-2 text-slate-600">
+              A place for your writing and the people who read it.
+            </p>
+            <form
+              onSubmit={handleSubmit(handlesubmit)}
+              className="mt-7 grid gap-4"
+            >
+              <label className="grid gap-1 text-sm font-semibold text-slate-700">
+                Name
+                <input
+                  {...register("name")}
+                  autoComplete="name"
+                  className="rounded-sm border border-slate-300 px-3 py-2.5 font-normal focus:border-emerald-700 focus:outline-none"
+                  placeholder="Your name"
+                  type="text"
+                />
+                {errors.name && (
+                  <span className="font-normal text-red-700">
+                    {errors.name.message}
+                  </span>
+                )}
+              </label>
+              <label className="grid gap-1 text-sm font-semibold text-slate-700">
+                Email
+                <input
+                  {...register("email")}
+                  autoComplete="email"
+                  className="rounded-sm border border-slate-300 px-3 py-2.5 font-normal focus:border-emerald-700 focus:outline-none"
+                  placeholder="you@example.com"
+                  type="email"
+                />
+                {errors.email && (
+                  <span className="font-normal text-red-700">
+                    {errors.email.message}
+                  </span>
+                )}
+              </label>
+              <label className="grid gap-1 text-sm font-semibold text-slate-700">
+                Password
+                <input
+                  {...register("password")}
+                  autoComplete="new-password"
+                  className="rounded-sm border border-slate-300 px-3 py-2.5 font-normal focus:border-emerald-700 focus:outline-none"
+                  placeholder="Letters followed by numbers"
+                  type="password"
+                />
+                {errors.password && (
+                  <span className="font-normal text-red-700">
+                    {errors.password.message}
+                  </span>
+                )}
+              </label>
+              <label className="grid gap-1 text-sm font-semibold text-slate-700">
+                Confirm password
+                <input
+                  {...register("Cpassword")}
+                  autoComplete="new-password"
+                  className="rounded-sm border border-slate-300 px-3 py-2.5 font-normal focus:border-emerald-700 focus:outline-none"
+                  placeholder="Enter your password again"
+                  type="password"
+                />
+                {errors.Cpassword && (
+                  <span className="font-normal text-red-700">
+                    {errors.Cpassword.message}
+                  </span>
+                )}
+              </label>
+              {submitError && (
+                <p role="alert" className="text-sm text-red-700">
+                  {submitError}
+                </p>
+              )}
+              <button
+                disabled={isSubmitting}
+                className="mt-1 rounded-sm bg-[#17483e] px-4 py-3 font-semibold text-white transition-colors hover:bg-emerald-800 disabled:cursor-wait disabled:opacity-60"
+                type="submit"
+              >
+                {isSubmitting ? "Creating your account..." : "Create account"}
+              </button>
+              {isSubmitting && (
+                <p role="status" className="text-center text-sm text-slate-600">
+                  Connecting securely to the server...
+                </p>
+              )}
+            </form>
+            <p className="mt-6 text-center text-sm text-slate-600">
+              Already have an account?{" "}
+              <Link
+                className="font-semibold text-emerald-800 hover:underline"
+                to="/login"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
+        </section>
+      </main>
     </div>
+  );
+};
 
-
-    </div>
-  )
-}
-
-export default Register
+export default Register;

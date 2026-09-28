@@ -1,41 +1,75 @@
-import React from 'react'
-import blogimage from "../assets/blog.png"
-const Footer = ({category}) => {
-  
-  return (  
-    <div id='About' className='flex items-start mt-auto min-w-[320px] sm:p-3 md:justify-between lg:justify-around p-1 gap-x-2 bg-gray-100 '>
-       <div className='grid gap-y-1 '>
-           <img className='w-20' src={blogimage} alt=""/>
-           <h1 className='text-gray-500 font-mono  '>A platform to share ideas ,stories,and knowledge with the world</h1>
-           <div className='flex gap-x-1'>
-            <img className='w-4 h-4  md:h-7 md:w-7 hover:scale-105 transition-all duration-600  cursor-pointer' src="https://img.icons8.com/ios/50/instagram-new--v1.png" alt="instagram-new--v1"/>
-             <img className='w-4 h-4 md:h-7 md:w-7 hover:scale-105 transition-all duration-600  cursor-pointer'  src="https://img.icons8.com/ios/50/facebook--v1.png" alt="facebook--v1"/>
-             <img className='w-4 h-4 md:h-7 md:w-7 hover:scale-105 transition-all duration-600  cursor-pointer' src="https://img.icons8.com/ios-filled/50/twitterx--v1.png" alt="twitterx--v1"/>
-             <img className='w-4 h-4 md:h-7 md:w-7  hover:scale-105 transition-all duration-600  cursor-pointer' src="https://img.icons8.com/color/48/linkedin.png" alt="linkedin"/>
-           </div>
-       </div>
-       <div>
-          <h1 className='font-bold'>Quick links</h1>
-             <ul className='font-mono grid gap-y-1'>
-                <li className='text-gray-500 hover:text-gray-800 transition-colors duration-300 cursor-pointer'>Home</li>
-                <li className='text-gray-500 hover:text-gray-800 transition-colors duration-300 cursor-pointer'>All posts</li>
-                <li className='text-gray-500 hover:text-gray-800 transition-colors duration-300 cursor-pointer'>Categories</li>
-                <li className='text-gray-500 hover:text-gray-800 transition-colors duration-300 cursor-pointer'>About</li>
-                <li className='text-gray-500 hover:text-gray-800 transition-colors duration-300 cursor-pointer'>Contact</li>
-             </ul>
-       </div>
-       <div>
-          <h1 className='font-bold'>Categories</h1>
-          <ul className='font-mono grid gap-y-1 text-gray-500'>
-             <li>Travel</li>
-             <li>Games</li>
-             <li>Technology</li>
-             <li>Study</li>
+import { Link } from "react-router-dom";
+import blogimage from "../assets/blog.png";
+
+const Footer = ({ category = [] }) => (
+  <footer id="About" className="mt-auto border-t border-slate-200 bg-white">
+    <div className="mx-auto grid max-w-6xl gap-8 px-5 py-8 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.5fr_1fr_1fr]">
+      <div>
+        <Link to="/home" className="inline-flex items-center gap-2">
+          <img className="h-9 w-9 object-contain" src={blogimage} alt="" />
+          <span className="font-serif text-xl font-bold text-[#17483e]">
+            Blogify
+          </span>
+        </Link>
+        <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
+          A place to share ideas, stories, and knowledge with the world.
+        </p>
+      </div>
+      <nav aria-label="Footer navigation">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-800">
+          Explore
+        </h2>
+        <ul className="mt-3 grid gap-2 text-sm text-slate-600">
+          <li>
+            <Link className="hover:text-emerald-800" to="/home">
+              All posts
+            </Link>
+          </li>
+          <li>
+            <Link className="hover:text-emerald-800" to="/home#category-finder">
+              Categories
+            </Link>
+          </li>
+          <li>
+            <Link className="hover:text-emerald-800" to="/account">
+              Your account
+            </Link>
+          </li>
+          <li>
+            <a className="hover:text-emerald-800" href="#About">
+              About Blogify
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div>
+        <h2 className="text-sm font-bold uppercase tracking-widest text-slate-800">
+          Topics
+        </h2>
+        {category.length ? (
+          <ul className="mt-3 grid gap-2 text-sm text-slate-600">
+            {category.slice(0, 5).map((item) => (
+              <li key={item._id}>
+                <Link
+                  className="hover:text-emerald-800"
+                  to={`/category/${item._id}/${encodeURIComponent(item.name)}`}
+                >
+                  {item.name}
+                </Link>
+              </li>
+            ))}
           </ul>
-       </div>
-
+        ) : (
+          <p className="mt-3 text-sm text-slate-600">
+            Browse categories from the post feed.
+          </p>
+        )}
+      </div>
     </div>
-  )
-}
+    <div className="border-t border-slate-100 px-5 py-3 text-center text-xs text-slate-500">
+      © {new Date().getFullYear()} Blogify
+    </div>
+  </footer>
+);
 
-export default Footer
+export default Footer;

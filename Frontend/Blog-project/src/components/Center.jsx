@@ -1,23 +1,38 @@
-import React from 'react'
-import blog from "../assets/bloggirl.png"
+import { Link } from "react-router-dom";
+import blog from "../assets/bloggirl.png";
+
 const Center = () => {
   return (
-    <div className='sm:grid grid-cols-2 sm:m-5 min-w-[300px] gap-x-2 rounded-lg  bg-purple-100  p-3'>
-          <div className='self-center'>
-              <div className='flex flex-col items-center gap-y-2 font-extrabold font-serif text-gray-700'>
-              <h1>Share Your Thoughts.</h1>
-              <h1>Inspire the World.</h1>
-               </div>
-               <div className='flex flex-col gap-y-2 items-center'>
-                <p className='text-gray-500'>Discover stories,ideas,and perspectives from writers around the world</p>
-                <button className='bg-purple-700 p-2 w-fit rounded-lg text-white font-bold'>Explore Posts</button>
-               </div>
-          </div>
-          <div >
-            <img className='object-contain' src={blog} alt=""/>
-          </div>
-    </div>
-  )
-}
+    <section className="w-full bg-[#17483e] text-white">
+      <div className="mx-auto grid min-h-65 max-w-6xl items-center gap-5 px-5 py-7 sm:min-h-75 sm:grid-cols-[1.1fr_0.9fr] sm:px-8">
+        <div className="max-w-xl">
+          <p className="text-xs font-bold uppercase tracking-widest text-emerald-200">
+            Read widely. Write honestly.
+          </p>
+          <h1 className="mt-3 font-serif text-3xl font-semibold leading-tight sm:text-4xl">
+            Ideas worth sharing, stories worth staying for.
+          </h1>
+          <p className="mt-3 max-w-lg text-sm leading-6 text-emerald-50 sm:text-base">
+            Find a fresh perspective, follow a topic, or publish something of
+            your own.
+          </p>
+          <Link
+            to="/home#post-feed"
+            className="mt-5 inline-flex rounded-sm bg-amber-500 px-4 py-2.5 text-sm font-bold text-slate-950 transition-colors hover:bg-amber-400"
+          >
+            Explore posts
+          </Link>
+        </div>
+        <div className="hidden justify-end sm:flex">
+          <img
+            className="h-56 w-full max-w-sm object-contain"
+            src={blog}
+            alt="A writer at work"
+          />
+        </div>
+      </div>
+    </section>
+  );
+};
 
-export default Center
+export default Center;
