@@ -22,7 +22,6 @@ function getAuthHeaders() {
     Authorization: `Bearer ${localStorage.getItem("token")}`,
   };
 }
-
 const Allpost = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
@@ -148,7 +147,6 @@ const Allpost = () => {
           ) : !error ? (
             <EmptyFeed />
           ) : null}
-
           <PageNavigation
             currentPage={currentPage}
             totalPages={totalPages}
