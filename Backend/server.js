@@ -15,6 +15,9 @@ const PORT = process.env.PORT || 3000;
 const authenticationmiddleare = require("./authmiddleware");
 app.use(express.json());
 console.log("MONGO_URI exists:", !!process.env.MONGO_URI);
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 const mongoDnsServers = (process.env.MONGO_DNS_SERVERS || "1.1.1.1,8.8.8.8")
   .split(",")
   .map((server) => server.trim())
